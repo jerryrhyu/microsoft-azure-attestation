@@ -81,7 +81,7 @@ Install Intel SGX DCAP Driver:
 ```
 sudo apt -y update
 sudo apt install -y dkms
-wget https://download.01.org/intel-sgx/sgx-dcap/1.4/linux/distro/ubuntuServer18.04/sgx_linux_x64_driver_1.21.bin -O sgx_linux_x64_driver.bin
+wget https://download.01.org/intel-sgx/latest/linux-latest/distro/ubuntu18.04-server/sgx_linux_x64_driver_1.41.bin -O sgx_linux_x64_driver.bin
 sudo chmod a+x sgx_linux_x64_driver.bin
 sudo ./sgx_linux_x64_driver.bin
 ```
@@ -89,7 +89,7 @@ For more information see: https://github.com/intel/linux-sgx#build-and-install-t
 
 Install Intel SGX SDK: 
 ```
-wget https://download.01.org/intel-sgx/sgx-dcap/1.4/linux/distro/ubuntuServer18.04/sgx_linux_x64_sdk_2.8.100.3.bin -O sgx_linux_x64_sdk.bin
+wget https://download.01.org/intel-sgx/latest/linux-latest/distro/ubuntu18.04-server/sgx_linux_x64_sdk_2.16.100.4.bin -O sgx_linux_x64_sdk.bin
 sudo chmod a+x sgx_linux_x64_sdk.bin
 sudo ./sgx_linux_x64_sdk.bin
 # Specify directory to intall Intel SDK. For example, /opt/intel
@@ -109,6 +109,7 @@ sudo apt install -y libssl-dev libsgx-quote-ex libsgx-enclave-common libsgx-encl
 1. ```git clone ``` this repo to the VM
 1. ```cd``` to the subdirectory containing this sample code
 1. To build, run and generate the JSON files do the following:
+    1. ```sudo usermod -aG sgx_prv $USER```
     1. ```cd genquotes```
     1. ```./runall.sh```
     1. This runs the application in four different enclave configurations to generate four different remote quotes.  You should see four new files created in the ```./genquotes/out``` directory.
