@@ -51,6 +51,7 @@ namespace validatequotes
             var maaService = new MaaService(this.attestDnsName);
             var serviceResponse = await maaService.AttestSgxEnclaveAsync(enclaveInfo.GetMaaBody());
             var serviceJwtToken = JObject.Parse(serviceResponse)["token"].ToString();
+	    SerializationHelper.WriteToFile("maaResponse.json", JObject.Parse(serviceResponse));
 
             // Analyze results
             Logger.WriteBanner("VALIDATING MAA JWT TOKEN - BASICS");

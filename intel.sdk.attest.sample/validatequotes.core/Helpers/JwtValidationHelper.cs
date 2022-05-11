@@ -123,6 +123,7 @@ namespace validatequotes.Helpers
                 Logger.WriteLine($"    JWT JKU value                  : {certificateDiscoveryEndpoint.ToString()}");
             }
 
+            Logger.WriteLine($"Tenant                 : {tenantName}");
             // Retrieve trusted signing keys from the attestation service
             var webClient = new WebClient();
             webClient.Headers.Add("tenantName", tenantName.Length > 24 ? tenantName.Remove(24) : tenantName);
