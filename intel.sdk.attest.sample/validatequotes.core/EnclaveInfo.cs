@@ -25,19 +25,28 @@ namespace validatequotes
 
         public void CompareToMaaServiceJwtToken(string serviceJwtToken, bool includeDetails)
         {
+            var jwtHeader = JoseHelper.ExtractJosePart(serviceJwtToken, 0);
             var jwtBody = JoseHelper.ExtractJosePart(serviceJwtToken, 1);
 
-            //if (includeDetails)
-            //{
-            //    Logger.WriteLine("");
-            //    Logger.WriteLine("Claims in MAA Service JWT Token");
-            //    Logger.WriteLine($"{jwtBody.ToString()}");
-            //    Logger.WriteLine("");
-            //}
+            if (includeDetails)
+            {
+                Logger.WriteBanner("JWT TOKEN - Header");
+                Logger.WriteLine("");
+                Logger.WriteLine($"{jwtHeader.ToString()}");
+                Logger.WriteLine("");
+
+                Logger.WriteBanner("JWT TOKEN - Body (Claims in MAA Token)");
+                Logger.WriteLine("");
+                Logger.WriteLine($"{jwtBody.ToString()}");
+                Logger.WriteLine("");
+
+            }
+            
+            Logger.WriteBanner("VALIDATING MAA JWT TOKEN - MATCHES CLIENT ENCLAVE INFO");
 
             var isDebuggable = (Attributes & 2) != 0;
-	    // In SGX DEBUG flag is equal to 0x0000000000000002ULL 
-	    // See https://github.com/intel/linux-sgx/blob/master/common/inc/sgx_attributes.h#L39
+	        // In SGX DEBUG flag is equal to 0x0000000000000002ULL 
+	        // See https://github.com/intel/linux-sgx/blob/master/common/inc/sgx_attributes.h#L39
             var isd = jwtBody["is-debuggable"];
             var isdpassed = isDebuggable == (bool)isd;
             Logger.WriteLine($"IsDebuggable match                 : {isdpassed}");

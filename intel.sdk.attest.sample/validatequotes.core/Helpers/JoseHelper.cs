@@ -9,6 +9,10 @@ namespace validatequotes
             string[] joseParts = jwt.Split('.');
             var decodedPart = Base64Url.DecodeString(joseParts[partIndex]);
             JObject jsonPart = JObject.Parse(decodedPart);
+
+            //Logger.WriteLine($"jwtParts.Length             : {joseParts.Length}");
+            //Logger.WriteLine($"decoded to string:          : {decodedPart}");
+
             return jsonPart;
         }
         public static JToken ExtractJosePartField(string jwt, int partIndex, string fieldName)

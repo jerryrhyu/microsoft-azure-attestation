@@ -1,7 +1,9 @@
 ﻿using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -46,7 +48,7 @@ namespace validatequotes.Helpers
             Logger.WriteLine($"JWT signing cert issuer validation : True");
             if (includeDetails)
             {
-                Logger.WriteLine($"    Signing certificate issuer     : {signingCertificate.Issuer}");
+                Logger.WriteLine($"Signing certificate issuer         : {signingCertificate.Issuer}");
             }
         }
 
@@ -61,7 +63,7 @@ namespace validatequotes.Helpers
             Logger.WriteLine($"JWT issuer claim validation        : True");
             if (includeDetails)
             {
-                Logger.WriteLine($"    JWT Issuer claim value         : {jwtTokenIssuerClaim.Value.ToString()}");
+                Logger.WriteLine($"JWT Issuer claim value             : {jwtTokenIssuerClaim.Value.ToString()}");
             }
         }
 
@@ -80,22 +82,28 @@ namespace validatequotes.Helpers
             {
                 throw new ArgumentException("JWT is not valid (signature verification failed)");
             }
-
+            var jsonStr = JsonConvert.SerializeObject(validatedToken, Formatting.Indented, new JsonSerializerSettings() 
+                                                        { 
+                                                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore 
+                                                        }); 
+            File.WriteAllText("validatedToken.json", jsonStr);
+            //Logger.WriteLine($"Validated JWT Token: {jsonStr}"); //not printable
+            
             Logger.WriteLine($"JWT signature validation           : True");
             if (includeDetails)
             {
                 X509SecurityKey signingKey = (X509SecurityKey)validatedToken.SecurityToken.SigningKey;
                 if (signingKey.PublicKey is RSA publicKey)
-		{
-		    var modulus = publicKey.ExportParameters(false).Modulus;
+                {
+                    var modulus = publicKey.ExportParameters(false).Modulus;
                     var exponent = publicKey.ExportParameters(false).Exponent;
                     Logger.WriteLine(37, 80, "    RSA signing key modulus        : ", BitConverter.ToString(modulus).Replace("-", ""));
                     Logger.WriteLine(37, 80, "    RSA signing key exponent       : ", BitConverter.ToString(exponent).Replace("-", ""));
-		}
-		else
-		{
-		    Logger.WriteLine($"Unexpected signing key type.  Signing Key Type: {signingKey.PublicKey.GetType()}");
-		}
+                }
+                else
+                {
+                    Logger.WriteLine($"Unexpected signing key type.  Signing Key Type: {signingKey.PublicKey.GetType()}");
+                }
             }
             return validatedToken;
         }
@@ -117,16 +125,21 @@ namespace validatequotes.Helpers
             {
                 throw new ArgumentException($"JWT JKU header not valid.  Value is '{certificateDiscoveryEndpoint.ToString()}'.  Expected value is '{expectedCertificateDiscoveryEndpoint}'");
             }
+            
             Logger.WriteLine($"JWT JKU location validation        : True");
+            
             if (includeDetails)
             {
-                Logger.WriteLine($"    JWT JKU value                  : {certificateDiscoveryEndpoint.ToString()}");
+                Logger.WriteLine($"JWT JKU value                      : {certificateDiscoveryEndpoint.ToString()}");
             }
+
+            //Logger.WriteLine($"Tenant                 : {tenantName}");
 
             // Retrieve trusted signing keys from the attestation service
             var webClient = new WebClient();
             webClient.Headers.Add("tenantName", tenantName.Length > 24 ? tenantName.Remove(24) : tenantName);
             var jwksValue = webClient.DownloadString(certificateDiscoveryEndpoint);
+            //Logger.WriteLine($"JWT trusted signing keys           : {jwksValue}");
 
             return new JsonWebKeySet(jwksValue);
         }

@@ -52,11 +52,14 @@ namespace validatequotes
             var serviceResponse = await maaService.AttestSgxEnclaveAsync(enclaveInfo.GetMaaBody());
             var serviceJwtToken = JObject.Parse(serviceResponse)["token"].ToString();
 
+            //Logger.WriteLine($"JWT Token ToString                 : {serviceJwtToken}");
+            SerializationHelper.WriteToFile("maaResponse.json", JObject.Parse(serviceResponse));
+
             // Analyze results
             Logger.WriteBanner("VALIDATING MAA JWT TOKEN - BASICS");
             JwtValidationHelper.ValidateMaaJwt(attestDnsName, serviceJwtToken, this.includeDetails);
 
-            Logger.WriteBanner("VALIDATING MAA JWT TOKEN - MATCHES CLIENT ENCLAVE INFO");
+            //Logger.WriteBanner("VALIDATING MAA JWT TOKEN - MATCHES CLIENT ENCLAVE INFO");
             enclaveInfo.CompareToMaaServiceJwtToken(serviceJwtToken, this.includeDetails);
             Logger.WriteLine("\n\n");
         }
