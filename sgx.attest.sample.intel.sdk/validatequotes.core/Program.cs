@@ -56,8 +56,9 @@ namespace validatequotes
             // Send to service for attestation
             var options = new AttestationClientOptions(tokenOptions: new AttestationTokenValidationOptions
                 {
-                    ExpectedIssuer = endpoint,
-                    ValidateIssuer = true,
+                    //ExpectedIssuer = endpoint,
+                    ValidateIssuer = false,
+                    //ValidateToken = false,
                 }
             );
 
@@ -73,8 +74,10 @@ namespace validatequotes
             var maaService = new AttestationClient(new Uri(endpoint), new DefaultAzureCredential(), options);
 
             BinaryData sgxEnclaveReport = BinaryData.FromBytes(HexHelper.ConvertHexToByteArray(enclaveInfo.QuoteHex));
+            Logger.WriteLine($"sgxEnclaveRerport size -     : {sgxEnclaveReport.ToArray().Length}");
 
             BinaryData runtimeData = BinaryData.FromBytes(HexHelper.ConvertHexToByteArray(enclaveInfo.EnclaveHeldDataHex));
+            Logger.WriteLine($"runtimeData size -     : {runtimeData.ToArray().Length}");
 
             var serviceResponse = await maaService.AttestSgxEnclaveAsync(
                 new AttestationRequest
@@ -82,8 +85,9 @@ namespace validatequotes
                     Evidence = sgxEnclaveReport,
                     RuntimeData = new AttestationData( runtimeData, false),
                 });
-            var serviceJwtToken = serviceResponse.Token.ToString();
-
+            // Save the raw token (which has 3 parts Hex)
+            var serviceJwtToken = serviceResponse.Token.Serialize();
+            await File.WriteAllTextAsync("jwt-sgx-raw.txt", serviceJwtToken);
 
 
             Logger.WriteBanner("VALIDATING MAA JWT TOKEN - MATCHES CLIENT ENCLAVE INFO");

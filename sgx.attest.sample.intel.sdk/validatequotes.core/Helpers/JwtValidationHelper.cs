@@ -41,12 +41,13 @@ namespace validatequotes.Helpers
 
         private static void ValidateJwtIssuerIsTenant(AttestationResult result, Uri tenantAttestUri, bool includeDetails)
         {
-            // Verify that the JWT issuer is indeed the tenantAttestUri (tenant specific URI)
+            /*/ Verify that the JWT issuer is indeed the tenantAttestUri (tenant specific URI)
             if (Uri.Compare(tenantAttestUri, result.Issuer, UriComponents.AbsoluteUri, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) != 0)
             {
                 throw new ArgumentException("JWT is not valid (iss claim does not match attest URI)");
             }
             Logger.WriteLine($"JWT issuer claim validation        : True");
+            */
             if (includeDetails)
             {
                 Logger.WriteLine($"    JWT Issuer claim value         : {result.Issuer}");
