@@ -5,4 +5,5 @@
   <HeapMaxSize>0x400000</HeapMaxSize>
   <TCSNum>2</TCSNum>
   <DisableDebug>0</DisableDebug>
+  <EnableKSS>1</EnableKSS>
 </EnclaveConfiguration>
