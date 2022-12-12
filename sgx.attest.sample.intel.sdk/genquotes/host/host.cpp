@@ -95,10 +95,13 @@ int SGX_CDECL main(int argc, char *argv[])
     }
     printf("succeed!\n");
 
-    uint8_t enclave_held_data[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+    //uint8_t enclave_held_data[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+    char * enclave_held_data = "{\"k\":\"v\"}";
+
     sgx_report_data_t hash;
-    sha256sum(enclave_held_data, 6, hash.d);
-    //printh(hash.d, sizeof(hash.d));
+    sha256sum((uint8_t *)enclave_held_data, strlen(enclave_held_data), hash.d);
+
+    printh(hash.d, sizeof(hash.d));
 
     printf("\nStep2: Call create_app_report: ");
     sgx_report_t app_report;
@@ -166,7 +169,7 @@ int SGX_CDECL main(int argc, char *argv[])
     fprintf(fp, "  \"SecurityVersion\": %u,\n", (int)app_report.body.isv_svn);
     fprintf(fp, "  \"Attributes\": %lu,\n", (uint64_t)app_report.body.attributes.flags);
     fprintf(fp, "  \"QuoteHex\": \"%s\",\n", format_hex_buffer(hex_buffer, hex_buffer_size, p_quote_buffer, quote_size));
-    fprintf(fp, "  \"EnclaveHeldDataHex\": \"%s\"\n", format_hex_buffer(hex_buffer, hex_buffer_size, enclave_held_data, sizeof( enclave_held_data)));
+    fprintf(fp, "  \"EnclaveHeldDataHex\": \"%s\"\n", format_hex_buffer(hex_buffer, hex_buffer_size, (uint8_t *)enclave_held_data, strlen( enclave_held_data)));
     fprintf(fp, "%s\n", "}");
     fclose(fp);
 
