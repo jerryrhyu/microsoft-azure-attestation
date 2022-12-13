@@ -16,7 +16,7 @@ namespace validatequotes.Helpers
             var attestUri = new Uri($"https://{attestDnsName}");
 
             AttestationResult result = serviceToken.GetBody<AttestationResult>();
-            ValidateJwtIssuerIsTenant(result, attestUri, includeDetails);
+            //ValidateJwtIssuerIsTenant(result, attestUri, includeDetails);
             ValidateSigningCertIssuerMatchesJwtIssuer(result, tokenSigner, includeDetails);
 
             return true;
@@ -28,6 +28,7 @@ namespace validatequotes.Helpers
         {
             // Ensure that the JWT signing certificate is issued by the same issuer as the JWT itself
             var signingCertificate = signer.SigningCertificates[0];
+	    /*
             if (!string.Equals(signingCertificate.Issuer, "CN=" + result.Issuer.OriginalString, StringComparison.OrdinalIgnoreCase))
             {
                 throw new ArgumentException("JWT is not valid (signing certificate issuer does not match JWT issuer)");
@@ -37,6 +38,9 @@ namespace validatequotes.Helpers
             {
                 Logger.WriteLine($"    Signing certificate issuer     : {signingCertificate.Issuer}");
             }
+	    */
+	    Logger.WriteLine($"    Signing certificate issuer     : {signingCertificate.Issuer}");
+	    Logger.WriteLine($"    Token issuer: {result.Issuer.OriginalString}");
         }
 
         private static void ValidateJwtIssuerIsTenant(AttestationResult result, Uri tenantAttestUri, bool includeDetails)

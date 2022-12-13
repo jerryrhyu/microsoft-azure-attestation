@@ -52,11 +52,12 @@ namespace validatequotes
             // Send to service for attestation
 
             string endpoint = "https://" + this.attestDnsName;
+            string expectedIssuer = "https://amber.com/";
 
             // Send to service for attestation
             var options = new AttestationClientOptions(tokenOptions: new AttestationTokenValidationOptions
                 {
-                    ExpectedIssuer = endpoint,
+                    ExpectedIssuer = expectedIssuer,
                     ValidateIssuer = true,
                 }
             );
