@@ -98,7 +98,7 @@ int SGX_CDECL main(int argc, char *argv[])
     uint8_t enclave_held_data[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     sgx_report_data_t hash;
     sha256sum(enclave_held_data, 6, hash.d);
-    //printh(hash.d, sizeof(hash.d));
+    printh(hash.d, sizeof(hash.d));
 
     printf("\nStep2: Call create_app_report: ");
     sgx_report_t app_report;
@@ -216,12 +216,27 @@ bool create_app_enclave_report(const char* enclave_path,
     int launch_token_updated = 0;
     sgx_launch_token_t launch_token = { 0 };
 
-    sgx_status = sgx_create_enclave(enclave_path,
+    char *policy = "{\"platform\":\"icelake\"}";
+
+    //uint8_t enclave_held_data[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+    uint8_t hash[32] = {};
+    sha256sum((uint8_t *)policy, strlen(policy), hash);
+    printh(hash, sizeof(hash));
+
+    sgx_kss_config_t kss_config = {{0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}, 1};
+    memcpy((uint8_t *)kss_config.config_id, (uint8_t *)hash, 32);
+    const void* ex_features [32] = {};
+    ex_features[SGX_CREATE_ENCLAVE_EX_KSS_BIT_IDX] = &kss_config;
+
+    sgx_status = sgx_create_enclave_ex(enclave_path,
                                     SGX_DEBUG_FLAG,
                                     &launch_token,
                                     &launch_token_updated,
                                     &eid,
-                                    NULL);
+                                    NULL,
+				    SGX_CREATE_ENCLAVE_EX_KSS,
+				    ex_features
+				    );
     if (SGX_SUCCESS != sgx_status) {
         printf("Error, call sgx_create_enclave fail [%s], SGXError:%04x.\n", __FUNCTION__, sgx_status);
         ret = false;
